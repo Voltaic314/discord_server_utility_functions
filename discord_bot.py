@@ -3,6 +3,7 @@ import os
 import discord
 from discord import app_commands
 import config
+import find_duplicate_emojis
 
 
 class Bot(discord.Client):
@@ -26,6 +27,34 @@ class Bot(discord.Client):
             await tree.sync()
             self.synced = True
         print(f"We have logged in as {self.user}.")
+
+
+@tree.command(name="find_duplicate_emotes", description="Responds with a list of potential duplicate emotes in the server's emote list")
+async def Duplicate_Emote_command(Interaction: discord.Interaction):
+    await Interaction.response.defer()
+
+    emote_list = get_static_emotes()
+
+    potential_duplicates = find_duplicates_through_hashes(emote_list)
+
+    if not potential_duplicates:
+        formatted_string_to_send_to_channel = 'There were no duplicates found!'
+        Interaction.channel.send(formatted_string_to_send_to_channel)
+
+    else:
+
+        formatted_string_to_send_to_channel = ''
+        formatted_string_to_send_to_channel += f'Found: {len(potential_duplicates)} emotes with potential duplicates.'
+        formatted_string_to_send_to_channel += 'Here are a list of emote names and their potential duplicates to check:'
+
+        for emote, duplicate_list in potential_duplicates.items():
+
+            duplicate_list_string = ', '.join(duplicate_list)
+
+            formatted_string_to_send_to_channel += f'Emote: {emote.name}, Potential Duplicate Emotes: {duplicate_list_string}'
+
+        Interaction.channel.send(formatted_string_to_send_to_channel)
+
 
 
 if __name__ == "__main__":

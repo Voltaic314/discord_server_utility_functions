@@ -8,15 +8,10 @@ import requests
 from emote import Emote
 
 
-client = Bot()
-tree = client.tree
-
-
-
 def get_static_emotes() -> list[object]:
     
     # first get the list of emotes from the server. (This will actually be a tuple).
-    guild = client.get_guild(client.server_id)
+    guild = Bot.get_guild(Bot.server_id)
     tuple_of_emote_objects = guild.emojis
 
     # iterate through the emotes and only create a list of emote objects from static image emotes
@@ -55,32 +50,3 @@ def find_duplicates_through_hashes(list_of_emotes: list[object]) -> dict[object:
                     dictionary_of_ids_and_duplicate_ids[emote].append(second_emote)
 
     return dictionary_of_ids_and_duplicate_ids
-
-
-
-@tree.command(name="find_duplicate_emotes", description="Responds with a list of potential duplicate emotes in the server's emote list")
-async def Duplicate_Emote_command(Interaction: discord.Interaction):
-    await Interaction.response.defer()
-
-    emote_list = get_static_emotes()
-
-    potential_duplicates = find_duplicates_through_hashes(emote_list)
-
-    if not potential_duplicates:
-        formatted_string_to_send_to_channel = 'There were no duplicates found!'
-        Interaction.channel.send(formatted_string_to_send_to_channel)
-
-    else:
-
-        formatted_string_to_send_to_channel = ''
-        formatted_string_to_send_to_channel += f'Found: {len(potential_duplicates)} emotes with potential duplicates.'
-        formatted_string_to_send_to_channel += 'Here are a list of emote names and their potential duplicates to check:'
-
-        for emote, duplicate_list in potential_duplicates.items():
-
-            duplicate_list_string = ', '.join(duplicate_list)
-
-            formatted_string_to_send_to_channel += f'Emote: {emote.name}, Potential Duplicate Emotes: {duplicate_list_string}'
-
-        Interaction.channel.send(formatted_string_to_send_to_channel)
-
