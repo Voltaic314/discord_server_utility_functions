@@ -7,6 +7,7 @@ import os
 import imagehash
 from PIL import Image
 
+
 class Emote:
 
     def __init__(self, emoji):
@@ -27,20 +28,6 @@ class Emote:
             f.write(requests.get(self.url).content)
 
         return os.path.exists(self.file_path)
-    
-
-    @property
-    def hash_string(self):
-        """
-        Run a difference hash and return the hash string from the given image specified in the file name.
-
-        :param filename: Name of the image file you wish to hash, must include full file name, so extension as well.
-        :returns: difference hash string that can be used to compare against other image hashes to find similar images.
-        """
-
-        hashed_image_string = str(imagehash.dhash(Image.open(self.file_path)))
-
-        return hashed_image_string
 
     def remove_file(self) -> bool:
         '''
@@ -59,8 +46,22 @@ class Emote:
             # check to make sure that actually worked
             file_exists = os.path.exists(file)
 
-            if not file_exists:
-                self.file_path = None
-                self.filename = None
+        self.file_path = None
+        self.filename = None
 
+    @property
+    def hash_string(self):
+        """
+        Run a difference hash and return the hash string from the given image specified in the file name.
 
+        :param filename: Name of the image file you wish to hash, must include full file name, so extension as well.
+        :returns: difference hash string that can be used to compare against other image hashes to find similar images.
+        """
+
+        self.write_image()
+
+        hashed_image_string = str(imagehash.dhash(Image.open(self.file_path)))
+
+        self.remove_file()
+
+        return hashed_image_string

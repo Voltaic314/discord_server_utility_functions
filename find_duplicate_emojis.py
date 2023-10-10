@@ -1,10 +1,4 @@
-import os
-import discord
-from discord import app_commands
 from discord_bot import Bot
-from PIL import Image
-import imagehash
-import requests
 from emote import Emote
 
 
@@ -18,7 +12,8 @@ def get_static_emotes() -> list[object]:
     list_of_emotes = []
     for emote in tuple_of_emote_objects:
         if not emote.animated:
-            list_of_emotes.append(Emote(url=emote.url))
+
+            list_of_emotes.append(Emote(emote))
 
     return list_of_emotes
 
